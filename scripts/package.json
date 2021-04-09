@@ -1,0 +1,14 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "description": "Scripts for data collection for data to train TwitchBot.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "aydang",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^3.2.0"
+  }
+}
