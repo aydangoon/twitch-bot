@@ -85,7 +85,7 @@ fs.access(filepath, fs.constants.F_OK | fs.constants.W_OK, (err) => {
     const bits = (badges && badges['bits']) || 0
     const isMod = mod ? 1 : 0
     const username = tags['display-name']
-    const bot = (/bot/i).test(username) ? 1 : 0
+    const bot = (/bot$/i).test(username) ? 1 : 0
     const msg = `"${message.replace(/"/g, "\"\"")}"`
 
     const line = `${username}, ${isMod}, ${sub}, ${bot}, ${bits}, ${msg}\n`
