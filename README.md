@@ -5,7 +5,7 @@
 files will then be loaded automatically
 
 ## scripts
-js files to interact with twitch
+js files to interact with twitch + data cleaning and parsing scripts (?)
 
 ## src 
 java files
