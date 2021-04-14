@@ -1,7 +1,9 @@
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -12,6 +14,10 @@ public class Digraph<T> {
 	
 	public Digraph() {
 		li = new HashMap<T, List<Tuple<T, Double>>>();
+	}
+	
+	public int nodeCount() {
+		return li.size();
 	}
 	
 	public boolean hasNode(T value) {
@@ -54,6 +60,25 @@ public class Digraph<T> {
 		for (Tuple<T, Double> tup : li.get(src))
 			children.add(tup._1);
 		return children;
+	}
+	
+	public List<T> nodes() {
+		List<T> out = new LinkedList<T>();
+		Iterator<T> iter = this.li.keySet().iterator();
+		while (iter.hasNext())
+			out.add(iter.next());
+		return out;
+	}
+	
+	public List<Tuple<T, Tuple<T, Double>>> edges() {
+		List<Tuple<T, Tuple<T, Double>>> out = new LinkedList<Tuple<T, Tuple<T, Double>>>();
+		Iterator<Entry<T, List<Tuple<T, Double>>>> entries = li.entrySet().iterator();
+		while (entries.hasNext()) {
+			Entry<T, List<Tuple<T, Double>>> entry = entries.next();
+			for (Tuple<T, Double> target : entry.getValue())
+				out.add(new Tuple<T, Tuple<T, Double>>(entry.getKey(), target));
+		}
+		return out;
 	}
 	
 	public String toString() {

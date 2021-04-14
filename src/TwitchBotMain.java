@@ -1,5 +1,9 @@
+import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.swing.JFrame;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -75,6 +79,17 @@ public class TwitchBotMain {
 		
 		System.out.println("Naive sentence built with model:");
 		System.out.println(sentence);
+		
+		MarkovChainVisualization<String> mcv = new MarkovChainVisualization<String>(g);
+		
+		JFrame window = new JFrame();
+		window.setTitle("TwitchBot Markov Chain Visualization");
+		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		window.setSize(new Dimension(Constants.WIDTH, Constants.HEIGHT));
+		window.setResizable(false);
+		window.add(mcv);
+		window.setVisible(true);
+		
 	}
 
 }
