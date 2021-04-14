@@ -1,22 +1,14 @@
 import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.swing.JFrame;
-
 import java.util.Iterator;
-import java.util.List;
 
 public class TwitchBotMain {
 
 	public static void main(String[] args) {
-		
-		String sen = "pepeLaugh TeaTime DONT TELL HIM pepeLaugh TeaTime DONT TELL HIM " + 
-		"pepeLaugh TeaTime DONT TELL HIM pepeLaugh TeaTime DONT TELL HIM " + 
-		"pepeLaugh TeaTime OH NO NO pepeLaugh TeaTime OH NO NO pepeLaugh TeaTime"+
-		" OH NO NO pepeLaugh TeaTime OH NO NO pepeLaugh TeaTime OH NO NO pepeLaugh TeaTime OH NO NO " +
-		"pepeLaugh TeaTime HERE IT COMES pepeLaugh TeaTime HERE IT COMES pepeLaugh TeaTime HERE IT COMES pepeLaugh TeaTime HERE IT COMES pepeLaugh TeaTime HERE IT COMES .";
-		String[] words = sen.split(" ");
+			
+		String[] words = "frog dog log cog frog".split(" ");
 		
 		Digraph<String> g = new Digraph<String>();
 		
@@ -53,32 +45,32 @@ public class TwitchBotMain {
 			}
 		}
 		
-		System.out.println(g);
+//			System.out.println(g);
 		
-		String word = "pepeLaugh";
-		int c = 0;
-		StringBuilder sentence = new StringBuilder();
-		List<String> nextWords;
-		do {
-			nextWords = g.childrenOf(word);
-			if (nextWords.size() > 0) {
-				double random = Math.random();
-				int i = 0;
-				while (random > g.getWeight(word, nextWords.get(i))) {
-					random -= g.getWeight(word, nextWords.get(i));
-					i++;
-				}
-				sentence.append(word + " ");
-				word = nextWords.get(i);
-				if (c++ == 10) {
-					c = 0;
-					sentence.append("\n");
-				}
-			}
-		} while (nextWords.size() > 0);
-		
-		System.out.println("Naive sentence built with model:");
-		System.out.println(sentence);
+//				String word = "pepeLaugh";
+//				int c = 0;
+//				StringBuilder sentence = new StringBuilder();
+//				List<String> nextWords;
+//				do {
+//					nextWords = g.childrenOf(word);
+//					if (nextWords.size() > 0) {
+//						double random = Math.random();
+//						int i = 0;
+//						while (random > g.getWeight(word, nextWords.get(i))) {
+//							random -= g.getWeight(word, nextWords.get(i));
+//							i++;
+//						}
+//						sentence.append(word + " ");
+//						word = nextWords.get(i);
+//						if (c++ == 10) {
+//							c = 0;
+//							sentence.append("\n");
+//						}
+//					}
+//				} while (nextWords.size() > 0);
+//				
+//				System.out.println("Naive sentence built with model:");
+//				System.out.println(sentence);
 		
 		MarkovChainVisualization<String> mcv = new MarkovChainVisualization<String>(g);
 		
@@ -89,7 +81,6 @@ public class TwitchBotMain {
 		window.setResizable(false);
 		window.add(mcv);
 		window.setVisible(true);
-		
 	}
 
 }

@@ -1,3 +1,4 @@
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -41,7 +42,6 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		// for quick generation of edge visuals
 		for (T node : rawNodes) {
 			pos = s.nextPoint();
-			System.out.println(pos);
 			lookup.put(node, new NodeVisual<T>(node, pos._1, pos._2));
 		}
 		
@@ -64,7 +64,6 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		
 		this.setFocusable(true);
 		this.setPreferredSize(new Dimension(Constants.WIDTH, Constants.HEIGHT));
-		this.setBackground(Color.LIGHT_GRAY);
 		this.addKeyListener(this);
 	}	
 	
@@ -75,6 +74,8 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		
 		g.clearRect(0, 0, Constants.WIDTH, Constants.HEIGHT);
 		g.setFont(Constants.FONT);
+		Graphics2D g2 = (Graphics2D) g;
+		g2.setStroke(new BasicStroke(1));
 		
 		int xOffset = Constants.WIDTH / 2;
 		int yOffset = Constants.HEIGHT / 2;
@@ -87,8 +88,7 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 			}
 		}
 		
-		int x, y, x2, y2;
-		
+		int x, y, x2, y2, sx, sy;
 		NodeVisual<T> src;
 		NodeVisual<T> tgt;
 		for (EdgeVisual<T> edge : edges) {
@@ -98,14 +98,39 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 			y = src.getY() + yOffset - cam.getY();
 			x2 = tgt.getX() + xOffset - cam.getX();
 			y2 = tgt.getY() + yOffset - cam.getY();
-			if (!hidden.contains(src) || !hidden.contains(tgt)) {
-				g.setColor(Constants.EDGE_COLOR);
-				g.drawLine(x, y, x2, y2);
-				g.setColor(Color.BLACK);
-				g.drawString(String.format("%.2f", edge.getWeight()), (x + x2) / 2, (y + y2) / 2);
-			}	
+			
+			if (!src.equals(tgt)) {
+				
+				sx = x2 - x;
+				sy = y2 - y;
+				int len = (int) Math.sqrt(sx*sx + sy*sy);
+				sx = nr * sx / len;
+				sy = nr * sy / len;
+				x2 -= sx;
+				y2 -= sy;
+				int px = (int)(0.6 * sy);
+				int py = (int)(-0.6 * sx);
+				
+				int p1x = x2 - sx + px;
+				int p1y = y2 - sy + py;
+				
+				int p2x = x2 - sx - px;
+				int p2y = y2 - sy - py;
+				
+				int[] poiX = {p1x, p2x, x2};
+				int[] poiY = {p1y, p2y, y2};
+				
+				if (!hidden.contains(src) || !hidden.contains(tgt)) {
+					g.setColor(Constants.EDGE_COLOR);
+					g.drawLine(x, y, x2, y2);
+					g.fillPolygon(poiX, poiY, 3);
+					g.setColor(Constants.TEXT_COLOR);
+					g.drawString(String.format("%.2f", edge.getWeight()), (x + x2) / 2, (y + y2) / 2);
+				}	
+				
+			}
+			
 		}
-		
 		
 		
 		for (NodeVisual<T> node : nodes) {
@@ -113,28 +138,19 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 			y = node.getY() + yOffset - cam.getY() - nr;
 			g.setColor(Constants.NODE_COLOR);
 			g.fillOval(x, y, 2 * nr, 2 * nr);
-			g.setColor(Color.BLACK);
+			g.setColor(Constants.TEXT_COLOR);
 			g.drawString(node.getValue().toString(), x, y);
 		}
 		
 	}
 	
 	public void tick() {
-		
-		//System.out.println(this.hor + " " + this.ver);
-		cam.update(this.hor, this.ver);
-		
+
+		cam.update(this.hor, this.ver);		
 		this.repaint();
 		
 	}
 	
-	
-	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	@Override
 	public void keyPressed(KeyEvent e) {
 		
@@ -173,4 +189,8 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 				break;
 		}
 	}
+	
+	@Override
+	public void keyTyped(KeyEvent e) {}
+
 }
