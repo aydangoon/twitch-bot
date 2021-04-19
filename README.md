@@ -11,7 +11,8 @@ js files to interact with twitch + data cleaning and parsing scripts (?)
 java files
 
 ## data
-raw data collected
+Some raw data collected. Not the actual messages, those can be found
+at this link: https://drive.google.com/file/d/1NgPpL2ocY20ngCAHfKlH_fwBhc_8OqjP/view?usp=sharing
 
 ## .gitignore
 dont worry about it bud
