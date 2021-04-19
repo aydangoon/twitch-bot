@@ -70,7 +70,7 @@ fs.access(filepath, fs.constants.F_OK | fs.constants.W_OK, (err) => {
     messagesLastSecond = 0
   }, 1000)
 
-  client.on('message', (channel, tags, message) => {
+  client.on('message', (_channel, tags, message) => {
 
     if (dataCollected >= sizeLimit) {
       console.log('Data limit reached, ending farming...')

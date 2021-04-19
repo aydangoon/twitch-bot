@@ -1,4 +1,6 @@
+package utils;
 
+// Basic tuple object.
 public class Tuple<V1, V2> {
 
 	public V1 _1;

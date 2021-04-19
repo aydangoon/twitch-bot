@@ -1,4 +1,6 @@
+package vis;
 
+// Data for a node visual in the Markov Chain visualization.
 public class NodeVisual<T> {
 	
 	private T value;

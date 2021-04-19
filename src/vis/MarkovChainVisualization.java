@@ -1,9 +1,6 @@
-import java.awt.BasicStroke;
-import java.awt.Color;
+package vis;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -18,14 +15,22 @@ import java.util.Set;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import utils.Constants;
+import utils.Sunflower;
+import utils.Tuple;
+
+import mc.Digraph;
+
+// A visualizer for a Markov Chain.
 public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 
 	private List<NodeVisual<T>> nodes;
 	private List<EdgeVisual<T>> edges;
-	private int hor;
-	private int ver;
+	private int xInput;
+	private int yInput;
 	private Camera cam;
 	private Timer t;
+	private int zoomInput;
 	
 	public MarkovChainVisualization(Digraph<T> g) {
 		
@@ -54,13 +59,14 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		}
 		
 		cam = new Camera();
+		zoomInput = 0;
 		
-		t = new Timer(1000 / 60, new ActionListener() {
+		t = new Timer(Constants.MILLISECONDS_PER_FRAME, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				tick();
 			}
 		});
-		t.restart();
+		t.start();
 		
 		this.setFocusable(true);
 		this.setPreferredSize(new Dimension(Constants.WIDTH, Constants.HEIGHT));
@@ -71,15 +77,12 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		super.paintComponent(g);
 		
 		Set<NodeVisual<T>> hidden = new HashSet<NodeVisual<T>>();
-		
-		g.clearRect(0, 0, Constants.WIDTH, Constants.HEIGHT);
+	
 		g.setFont(Constants.FONT);
-		Graphics2D g2 = (Graphics2D) g;
-		g2.setStroke(new BasicStroke(1));
 		
 		int xOffset = Constants.WIDTH / 2;
 		int yOffset = Constants.HEIGHT / 2;
-		int nr = Constants.NODE_RADIUS;
+		int nr = Constants.NODE_RADIUS + cam.getZoom();
 		
 		for (NodeVisual<T> node : nodes) {
 			if (node.getX() < cam.getX() - xOffset || node.getX() > cam.getX() + xOffset
@@ -117,8 +120,8 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 				int p2x = x2 - sx - px;
 				int p2y = y2 - sy - py;
 				
-				int[] poiX = {p1x, p2x, x2};
-				int[] poiY = {p1y, p2y, y2};
+				int[] poiX = { p1x, p2x, x2 };
+				int[] poiY = { p1y, p2y, y2 };
 				
 				if (!hidden.contains(src) || !hidden.contains(tgt)) {
 					g.setColor(Constants.EDGE_COLOR);
@@ -127,7 +130,6 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 					g.setColor(Constants.TEXT_COLOR);
 					g.drawString(String.format("%.2f", edge.getWeight()), (x + x2) / 2, (y + y2) / 2);
 				}	
-				
 			}
 			
 		}
@@ -146,28 +148,38 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 	
 	public void tick() {
 
-		cam.update(this.hor, this.ver);		
+		cam.update(this.xInput, this.yInput, this.zoomInput);
 		this.repaint();
 		
 	}
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
-		
+		System.out.println("key pressed");
 		switch (e.getKeyCode()) {
 			case KeyEvent.VK_UP:
-				this.ver = -1;
+				this.yInput = -1;
 				break;
 			case KeyEvent.VK_DOWN:
-				this.ver = 1;
+				this.yInput = 1;
+				break;
+			
+		}
+		
+		switch (e.getKeyCode()) {
+			case KeyEvent.VK_Z:
+				this.zoomInput = 1;
+				break;
+			case KeyEvent.VK_X:
+				this.zoomInput = -1;
 				break;
 		}
 		switch (e.getKeyCode()) {
 			case KeyEvent.VK_LEFT:
-				this.hor = -1;
+				this.xInput = -1;
 				break;
 			case KeyEvent.VK_RIGHT:
-				this.hor = 1;
+				this.xInput = 1;
 				break;
 		}
 		
@@ -179,15 +191,19 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		switch (e.getKeyCode()) {
 			case KeyEvent.VK_UP:
 			case KeyEvent.VK_DOWN:
-				this.ver = 0;
+				this.yInput = 0;
 				break;
 		}
 		switch (e.getKeyCode()) {
 			case KeyEvent.VK_LEFT:
 			case KeyEvent.VK_RIGHT:
-				this.hor = 0;
+				this.xInput = 0;
 				break;
+			case KeyEvent.VK_Z:
+			case KeyEvent.VK_X:
+				this.zoomInput = 0;
 		}
+		
 	}
 	
 	@Override

@@ -1,19 +1,23 @@
+package vis;
 
+// Camera state for a Markov Chain visualization.
 public class Camera {
 
 	private int x;
 	private int y;
+	private int zoom;
 	private double velX;
 	private double velY;
 	
 	public Camera() {
 		this.x = 0;
 		this.y = 0;
+		this.zoom = 0;
 		this.velX = 0;
 		this.velY = 0;
 	}
 	
-	public void update(int hor, int ver) {
+	public void update(int hor, int ver, int zoom) {
 		
 		
 		this.x += velX;
@@ -42,6 +46,8 @@ public class Camera {
 			velY = -15;
 		}
 		
+		this.zoom += zoom;
+		
 	}
 
 	public int getY() {
@@ -50,6 +56,10 @@ public class Camera {
 
 	public int getX() {
 		return x;
+	}
+	
+	public int getZoom() {
+		return this.zoom;
 	}
 	
 }

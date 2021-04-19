@@ -1,4 +1,6 @@
+package vis;
 
+//Data for an edge visual in the Markov Chain visualization.
 public class EdgeVisual<T> {
 
 	private final NodeVisual<T> src;
