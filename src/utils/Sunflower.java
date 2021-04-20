@@ -1,7 +1,7 @@
 package utils;
 
 // Defines a semi-uniform point distribution for nodes in 
-// the markov chain visualization.
+// the markov chain visualization. Sunflower
 public class Sunflower {
 	
 	private double points;

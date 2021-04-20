@@ -8,7 +8,8 @@ import javax.swing.*;
 
 import utils.Constants;
 
-public class MarkovChainBuilder extends JPanel{
+public class MarkovChainBuilder extends JPanel {
+	
 	private List<Message> messages;
 	Digraph<String> mc;
 	private JLabel actionName;
@@ -31,6 +32,7 @@ public class MarkovChainBuilder extends JPanel{
 	}
 	
 	public void buildMarkovChain() {
+		
 		this.progress.setValue(0);
 		this.progress.setMaximum(this.messages.size() / 50);
 		this.progressPercent.setText("0%");
