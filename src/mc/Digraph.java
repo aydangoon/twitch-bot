@@ -12,6 +12,7 @@ public class Digraph<T> {
 		li = new HashMap<T, List<Tuple<T, Double>>>();
 	}
 	
+	// get nodeCount
 	public int nodeCount() {
 		return li.size();
 	}
