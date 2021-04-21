@@ -7,7 +7,7 @@ public final class Constants {
 
 	public static final int WIDTH = 1000;
 	public static final int HEIGHT = 800;
-	public static final double GRAPH_SCALE_FACTOR = 7; // bitch
+	public static final double GRAPH_SCALE_FACTOR = 5; // im not
 	public static final int NODE_RADIUS = 10;
 	public static final int EDGE_THICKNESS = 2;
 	public static final Color NODE_COLOR = Color.decode("#444444");
