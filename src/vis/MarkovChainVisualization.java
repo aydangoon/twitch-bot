@@ -70,7 +70,7 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		
 		this.setFocusable(true);
 		this.setPreferredSize(new Dimension(Constants.WIDTH, Constants.HEIGHT));
-		this.addKeyListener(this);
+		//this.addKeyListener(this);
 	}	
 	
 	public void paintComponent(Graphics g) {
@@ -80,8 +80,8 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 	
 		g.setFont(Constants.FONT);
 		
-		int xOffset = Constants.WIDTH / 2;
-		int yOffset = Constants.HEIGHT / 2;
+		int xOffset = this.getWidth() / 2;
+		int yOffset = this.getHeight() / 2;
 		int nr = Constants.NODE_RADIUS + cam.getZoom();
 		
 		for (NodeVisual<T> node : nodes) {
@@ -155,7 +155,6 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
-		System.out.println("key pressed");
 		switch (e.getKeyCode()) {
 			case KeyEvent.VK_UP:
 				this.yInput = -1;

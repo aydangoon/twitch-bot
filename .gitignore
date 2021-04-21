@@ -1,6 +1,7 @@
 node_modules/
 bin/
 data/raw.csv
+data/clean.csv
 .DS_Store
 .classpath
 .project
