@@ -23,12 +23,16 @@ def clean(line):
     msg_meta = line[:split_ind + 1]
     msg_clean = line[split_ind + 1:]
 
-    # remove extraneous spaces
-    msg_clean = re.sub(r"[\s]{2,}", " ", msg_clean)
-
     # remove all links
     msg_clean = re.sub(r"https[^\s\"]*", "", msg_clean)
 
+    # for csv format, strings are quoted, and " is replaced with ""
+    # we don't need these, so single quotes are removed and "" are turned into "
+    msg_clean = re.sub(r"\"([^\"])", r"\1", msg_clean)
+    msg_clean = re.sub(r"\"\"", "\"", msg_clean)
+
+    # remove extraneous spaces
+    msg_clean = re.sub(r"[\s]{2,}", " ", msg_clean)
     # TODO fix common misspellings
 
     # stem exaggerations
@@ -45,8 +49,13 @@ def main():
     raw_data = open(os.path.join(os.getcwd(), "data/test.csv"), "r")
     clean_data = open(os.path.join(os.getcwd(), "data/clean.csv"), "w")
 
-    for line in raw_data:
-        clean_data.write(clean(line))
+    lines = list(raw_data)
+    num_lines = len(lines)
+    for i in range(num_lines):
+        clean_data.write(clean(lines[i]))
+        # DONT UNCOMMENT these mofos slow this process down an ungodly amount
+        #os.system('clear')
+        #print(i + 1, "/", num_lines, "cleaned")
 
 
 main()

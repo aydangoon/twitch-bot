@@ -14,7 +14,7 @@ public class TwitchBotMain {
 	public static void main(String[] args) {
 		
 		JFrame window = new JFrame();
-		window.setTitle("TwitchBot");
+		window.setTitle("Twitch Bot");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(true);
 		

@@ -16,6 +16,6 @@ public final class Constants {
 	public static final double CAMERA_ACCEL = 0.5;
 	public static final Font FONT = new Font("courier new", Font.BOLD, 14);
 	public static final int MILLISECONDS_PER_FRAME = 1000 / 60;
-	public static final String FILENAME = "./data/test.csv";
+	public static final String FILENAME = "./data/clean.csv";
 	public static final int LINES = 239823;
 }
