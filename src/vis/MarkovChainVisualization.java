@@ -80,9 +80,9 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 	
 		g.setFont(Constants.FONT);
 		
-		int xOffset = this.getWidth() / 2;
-		int yOffset = this.getHeight() / 2;
-		int nr = Constants.NODE_RADIUS + cam.getZoom();
+		int xOffset = (int)(this.getWidth() / (2 * cam.getZoom()));
+		int yOffset = (int)(this.getHeight() / (2 * cam.getZoom()));
+		int nr = (int)(Constants.NODE_RADIUS /** cam.getZoom()*/);
 		
 		for (NodeVisual<T> node : nodes) {
 			if (node.getX() < cam.getX() - xOffset || node.getX() > cam.getX() + xOffset
@@ -97,18 +97,18 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		for (EdgeVisual<T> edge : edges) {
 			src = edge.getSrc();
 			tgt = edge.getTgt();
-			x = src.getX() + xOffset - cam.getX();
-			y = src.getY() + yOffset - cam.getY();
-			x2 = tgt.getX() + xOffset - cam.getX();
-			y2 = tgt.getY() + yOffset - cam.getY();
+			x = (int)(cam.getZoom() * (src.getX() + xOffset - cam.getX()));
+			y = (int)(cam.getZoom() * (src.getY() + yOffset - cam.getY()));
+			x2 = (int)(cam.getZoom() * (tgt.getX() + xOffset - cam.getX()));
+			y2 = (int)(cam.getZoom() * (tgt.getY() + yOffset - cam.getY()));
 			
-			if (!src.equals(tgt)) {
+			if (!src.equals(tgt) && (!hidden.contains(src) || !hidden.contains(tgt))) {
 				
 				sx = x2 - x;
 				sy = y2 - y;
 				int len = (int) Math.sqrt(sx*sx + sy*sy);
-				sx = nr * sx / len;
-				sy = nr * sy / len;
+				sx = (int)(cam.getZoom() * nr) * sx / len;
+				sy = (int)(cam.getZoom() * nr) * sy / len;
 				x2 -= sx;
 				y2 -= sy;
 				int px = (int)(0.6 * sy);
@@ -123,23 +123,21 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 				int[] poiX = { p1x, p2x, x2 };
 				int[] poiY = { p1y, p2y, y2 };
 				
-				if (!hidden.contains(src) || !hidden.contains(tgt)) {
-					g.setColor(Constants.EDGE_COLOR);
-					g.drawLine(x, y, x2, y2);
-					g.fillPolygon(poiX, poiY, 3);
-					g.setColor(Constants.TEXT_COLOR);
-					g.drawString(String.format("%.2f", edge.getWeight()), (x + x2) / 2, (y + y2) / 2);
-				}	
+				g.setColor(Constants.EDGE_COLOR);
+				g.drawLine(x, y, x2, y2);
+				g.fillPolygon(poiX, poiY, 3);
+				g.setColor(Constants.TEXT_COLOR);
+				g.drawString(String.format("%.2f", edge.getWeight()), (x + x2) / 2, (y + y2) / 2);
 			}
 			
 		}
 		
 		
 		for (NodeVisual<T> node : nodes) {
-			x = node.getX() + xOffset - cam.getX() - nr;
-			y = node.getY() + yOffset - cam.getY() - nr;
+			x = (int)(cam.getZoom() * (node.getX() - cam.getX() + xOffset - nr));
+			y = (int)(cam.getZoom() * (node.getY() - cam.getY() + yOffset - nr));
 			g.setColor(Constants.NODE_COLOR);
-			g.fillOval(x, y, 2 * nr, 2 * nr);
+			g.fillOval(x, y, (int)(2 * nr * cam.getZoom()), (int)(2 * nr * cam.getZoom()));
 			g.setColor(Constants.TEXT_COLOR);
 			g.drawString(node.getValue().toString(), x, y);
 		}

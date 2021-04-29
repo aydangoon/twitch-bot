@@ -5,14 +5,14 @@ public class Camera {
 
 	private int x;
 	private int y;
-	private int zoom;
+	private double zoom;
 	private double velX;
 	private double velY;
 	
 	public Camera() {
 		this.x = 0;
 		this.y = 0;
-		this.zoom = 0;
+		this.zoom = 1;
 		this.velX = 0;
 		this.velY = 0;
 	}
@@ -25,28 +25,32 @@ public class Camera {
 		
 		switch (hor) {
 			case 1:
-				velX = 15;
+				velX = 15 / this.zoom;
 				break;
 			case 0:
 				velX = 0;
 				break;
 			case -1:
-				velX = -15;
+				velX = -15 / this.zoom;
 				break;
 		}
 		
 		switch (ver) {
-		case 1:
-			velY = 15;
-			break;
-		case 0:
-			velY = 0;
-			break;
-		case -1:
-			velY = -15;
+			case 1:
+				velY = 15 / this.zoom;
+				break;
+			case 0:
+				velY = 0;
+				break;
+			case -1:
+				velY = -15 / this.zoom;
 		}
 		
-		this.zoom += zoom;
+		if (zoom == 1 && this.zoom < 2) {
+			this.zoom += 0.02;
+		} else if (zoom == -1 && this.zoom > 0.5) {
+			this.zoom -= 0.02;
+		}
 		
 	}
 
@@ -58,7 +62,7 @@ public class Camera {
 		return x;
 	}
 	
-	public int getZoom() {
+	public double getZoom() {
 		return this.zoom;
 	}
 	
