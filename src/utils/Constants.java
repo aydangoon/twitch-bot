@@ -12,7 +12,7 @@ public final class Constants {
 	public static final int EDGE_THICKNESS = 2;
 	public static final Color NODE_COLOR = Color.decode("#444444");
 	public static final Color EDGE_COLOR = Color.decode("#cccccc");
-	public static final Color TEXT_COLOR = Color.decode("#82C09A");
+	public static final Color TEXT_COLOR = Color.black;//Color.decode("#82C09A");
 	public static final double CAMERA_ACCEL = 0.5;
 	public static final Font FONT = new Font("courier new", Font.BOLD, 14);
 	public static final int MILLISECONDS_PER_FRAME = 1000 / 60;

@@ -1,5 +1,7 @@
 package vis;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -77,16 +79,19 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		super.paintComponent(g);
 		
 		Set<NodeVisual<T>> hidden = new HashSet<NodeVisual<T>>();
-	
-		g.setFont(Constants.FONT);
+		
+		g.setFont(Constants.FONT.deriveFont((float)(14 * cam.getZoom() + 7)));
 		
 		int xOffset = (int)(this.getWidth() / (2 * cam.getZoom()));
 		int yOffset = (int)(this.getHeight() / (2 * cam.getZoom()));
-		int nr = (int)(Constants.NODE_RADIUS /** cam.getZoom()*/);
+		int nr = Constants.NODE_RADIUS;
 		
+		double forgivenessFactor = 1.5;
+		int hiddenXOffset = (int)(forgivenessFactor * xOffset);
+		int hiddenYOffset = (int)(forgivenessFactor * yOffset);
 		for (NodeVisual<T> node : nodes) {
-			if (node.getX() < cam.getX() - xOffset || node.getX() > cam.getX() + xOffset
-					|| node.getY() < cam.getY() - yOffset || node.getY() > cam.getY() + yOffset) {
+			if (node.getX() < cam.getX() - hiddenXOffset || node.getX() > cam.getX() + hiddenXOffset
+					|| node.getY() < cam.getY() - hiddenYOffset || node.getY() > cam.getY() + hiddenYOffset) {
 				hidden.add(node);
 			}
 		}
@@ -107,6 +112,9 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 				sx = x2 - x;
 				sy = y2 - y;
 				int len = (int) Math.sqrt(sx*sx + sy*sy);
+				if (len == 0) {
+					len = 1;
+				}
 				sx = (int)(cam.getZoom() * nr) * sx / len;
 				sy = (int)(cam.getZoom() * nr) * sy / len;
 				x2 -= sx;
@@ -123,11 +131,14 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 				int[] poiX = { p1x, p2x, x2 };
 				int[] poiY = { p1y, p2y, y2 };
 				
-				g.setColor(Constants.EDGE_COLOR);
+				// color is a function of probability
+				g.setColor(new Color((float)(0.25*(1-edge.getWeight())) + 0.5f, 0.75f, 0.75f));
 				g.drawLine(x, y, x2, y2);
 				g.fillPolygon(poiX, poiY, 3);
-				g.setColor(Constants.TEXT_COLOR);
-				g.drawString(String.format("%.2f", edge.getWeight()), (x + x2) / 2, (y + y2) / 2);
+				
+				// edge labels really clutter the graph. Maybe don't include?
+				//g.setColor(Constants.TEXT_COLOR);
+				//g.drawString(String.format("%.2f", edge.getWeight()), (x + x2) / 2, (y + y2) / 2);
 			}
 			
 		}

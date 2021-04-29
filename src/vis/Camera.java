@@ -48,7 +48,7 @@ public class Camera {
 		
 		if (zoom == 1 && this.zoom < 2) {
 			this.zoom += 0.02;
-		} else if (zoom == -1 && this.zoom > 0.5) {
+		} else if (zoom == -1 && this.zoom > 0.1) {
 			this.zoom -= 0.02;
 		}
 		
