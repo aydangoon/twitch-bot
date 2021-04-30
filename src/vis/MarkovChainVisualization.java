@@ -1,8 +1,11 @@
 package vis;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -14,51 +17,47 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.Timer;
+import javax.swing.border.EmptyBorder;
 
 import utils.Constants;
 import utils.Sunflower;
+import utils.UniformSquare;
 import utils.Tuple;
 
 import mc.Digraph;
 
 // A visualizer for a Markov Chain.
+@SuppressWarnings("serial")
 public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 
 	private List<NodeVisual<T>> nodes;
 	private List<EdgeVisual<T>> edges;
+	private Digraph<T> mc;
 	private int xInput;
 	private int yInput;
+	private int zoomInput;
 	private Camera cam;
 	private Timer t;
-	private int zoomInput;
+	
+	// jcomponents
+	private JPanel infoPanel;
+	private JLabel camInfo;
+	private JPanel senGen;
+	private JTextArea sentence;
 	
 	public MarkovChainVisualization(Digraph<T> g) {
 		
-		nodes = new LinkedList<NodeVisual<T>>();
-		edges = new LinkedList<EdgeVisual<T>>();
-		
-		Map<T, NodeVisual<T>> lookup = new HashMap<T, NodeVisual<T>>();
-		
-		List<T> rawNodes = g.nodes();
-		Sunflower s = new Sunflower(g.nodeCount());
-		Tuple<Integer, Integer> pos;
-		
-		// generate node visuals and add to lookup table
-		// for quick generation of edge visuals
-		for (T node : rawNodes) {
-			pos = s.nextPoint();
-			lookup.put(node, new NodeVisual<T>(node, pos._1, pos._2));
-		}
-		
-		// generate and store edge visuals, store node visuals
-		for (T src : rawNodes) {
-			for (T tgt : g.childrenOf(src)) {
-				edges.add(new EdgeVisual<T>(lookup.get(src), lookup.get(tgt), g.getWeight(src, tgt)));
-			}
-			nodes.add(lookup.get(src));
-		}
+		this.mc = g;
+		this.buildVisuals(g);
 		
 		cam = new Camera();
 		zoomInput = 0;
@@ -70,9 +69,50 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		});
 		t.start();
 		
+		this.infoPanel = new JPanel();
+		this.infoPanel.setPreferredSize(new Dimension(Constants.WIDTH - 10, 175));
+		this.infoPanel.setFont(Constants.FONT);
+		this.infoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		this.infoPanel.setBorder(BorderFactory.createLineBorder(Color.decode("#82C09A")));
+		
+		this.camInfo = new JLabel();
+		this.sentence = new JTextArea();
+		this.sentence.setEditable(false);
+		this.senGen = new JPanel();
+		this.senGen.setLayout(new FlowLayout(FlowLayout.LEFT));
+		this.senGen.setBorder(BorderFactory.createLineBorder(Color.decode("#82c09a")));
+		
+		JButton genSen = new JButton("Generate Sentence");
+		genSen.addActionListener(new ActionListener() {
+
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+		        generateSentence();
+		    }
+		});
+		genSen.setFocusable(false);
+		JPanel opts = new JPanel();
+		opts.setLayout(new BoxLayout(opts, BoxLayout.Y_AXIS));
+		opts.add(new JLabel("Message Type:"));
+		opts.add(new JCheckBox("subscriber", true));
+		opts.add(new JCheckBox("moderator", true));
+		opts.add(new JCheckBox("bot", true));
+		opts.add(new JCheckBox("pleb", true));
+		opts.add(genSen);
+		this.senGen.add(opts);
+		this.senGen.add(this.sentence);
+		
+		
+		this.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 		this.setFocusable(true);
 		this.setPreferredSize(new Dimension(Constants.WIDTH, Constants.HEIGHT));
+		this.add(this.infoPanel);
+		this.infoPanel.add(this.camInfo);
+		this.infoPanel.add(this.senGen);
 		//this.addKeyListener(this);
+		
+
+		
 	}	
 	
 	public void paintComponent(Graphics g) {
@@ -80,7 +120,9 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		
 		Set<NodeVisual<T>> hidden = new HashSet<NodeVisual<T>>();
 		
-		g.setFont(Constants.FONT.deriveFont((float)(14 * cam.getZoom() + 7)));
+		Font font = Constants.FONT.deriveFont((float)(14 * cam.getZoom() + 7));
+		FontMetrics metrics = g.getFontMetrics(font);
+		g.setFont(font);
 		
 		int xOffset = (int)(this.getWidth() / (2 * cam.getZoom()));
 		int yOffset = (int)(this.getHeight() / (2 * cam.getZoom()));
@@ -143,14 +185,16 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 			
 		}
 		
-		
+		String text;
 		for (NodeVisual<T> node : nodes) {
 			x = (int)(cam.getZoom() * (node.getX() - cam.getX() + xOffset - nr));
 			y = (int)(cam.getZoom() * (node.getY() - cam.getY() + yOffset - nr));
 			g.setColor(Constants.NODE_COLOR);
 			g.fillOval(x, y, (int)(2 * nr * cam.getZoom()), (int)(2 * nr * cam.getZoom()));
 			g.setColor(Constants.TEXT_COLOR);
-			g.drawString(node.getValue().toString(), x, y);
+			text = node.getValue().toString();
+			
+			g.drawString(text, x + (int)(cam.getZoom() * nr) - (metrics.stringWidth(text) / 2), y);
 		}
 		
 	}
@@ -158,6 +202,11 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 	public void tick() {
 
 		cam.update(this.xInput, this.yInput, this.zoomInput);
+		
+		this.camInfo.setText("<html><b>Camera Info</b><div>Zoom: " + String.format("%1.2f", this.cam.getZoom()) 
+			+ "</div><div>x: " + this.cam.getX()
+			+ "</div>y: " + this.cam.getY());
+		
 		this.repaint();
 		
 	}
@@ -216,5 +265,60 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 	
 	@Override
 	public void keyTyped(KeyEvent e) {}
+	
+	private void generateSentence() {
+		T word = (T) "pagman";
+		int c = 0;
+		int iters = 0;
+		StringBuilder sentence = new StringBuilder();
+		List<T> nextWords;
+		do {
+			nextWords = this.mc.childrenOf((T) word);
+			if (nextWords.size() > 0) {
+				double random = Math.random();
+				int i = 0;
+				while (random > this.mc.getWeight((T) word, nextWords.get(i))) {
+					random -= this.mc.getWeight((T) word, nextWords.get(i));
+					i++;
+				}
+				sentence.append(word + " ");
+				word = nextWords.get(i);
+				if (c++ == 10) {
+					c = 0;
+					sentence.append("\n");
+				}
+			}
+		} while (nextWords.size() > 0 && iters++ < 20);
+		
+		this.sentence.setText(sentence.toString());
+	}
+	
+	private void buildVisuals(Digraph<T> g) {
+		this.nodes = new LinkedList<NodeVisual<T>>();
+		this.edges = new LinkedList<EdgeVisual<T>>();
+		
+		Map<T, NodeVisual<T>> lookup = new HashMap<T, NodeVisual<T>>();
+		
+		List<T> rawNodes = g.nodes();
+		//Sunflower s = new Sunflower(g.nodeCount());
+		UniformSquare us = new UniformSquare((int)Math.sqrt(g.nodeCount()) + 1);
+		Tuple<Integer, Integer> pos;
+		
+		// generate node visuals and add to lookup table
+		// for quick generation of edge visuals
+		
+		for (T node : rawNodes) {
+			pos = us.nextPoint();
+			lookup.put(node, new NodeVisual<T>(node, pos._1, pos._2));
+		}
+		
+		// generate and store edge visuals, store node visuals
+		for (T src : rawNodes) {
+			for (T tgt : g.childrenOf(src)) {
+				this.edges.add(new EdgeVisual<T>(lookup.get(src), lookup.get(tgt), g.getWeight(src, tgt)));
+			}
+			this.nodes.add(lookup.get(src));
+		}
+	}
 
 }

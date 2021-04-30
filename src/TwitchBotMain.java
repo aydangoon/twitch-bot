@@ -3,6 +3,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+
 import mc.Digraph;
 import mc.MarkovChainBuilder;
 import mc.Message;
@@ -32,34 +34,6 @@ public class TwitchBotMain {
 		window.getContentPane().add(mcv);
 		window.addKeyListener(mcv);
 		window.setSize(mcv.getPreferredSize());
-		
-		
-//			String word = words.get((int)(words.size() * Math.random()));
-//			int c = 0;
-//			int iters = 0;
-//			StringBuilder sentence = new StringBuilder();
-//			List<String> nextWords;
-//			do {
-//				nextWords = g.childrenOf(word);
-//				if (nextWords.size() > 0) {
-//					double random = Math.random();
-//					int i = 0;
-//					while (random > g.getWeight(word, nextWords.get(i))) {
-//						random -= g.getWeight(word, nextWords.get(i));
-//						i++;
-//					}
-//					sentence.append(word + " ");
-//					word = nextWords.get(i);
-//					if (c++ == 10) {
-//						c = 0;
-//						sentence.append("\n");
-//					}
-//				}
-//			} while (nextWords.size() > 0 && iters++ < 10);
-			
-//			System.out.println("Naive sentence built with model:");
-//			System.out.println(sentence);
-		
 		
 	}
 

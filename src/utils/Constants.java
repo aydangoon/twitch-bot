@@ -18,4 +18,5 @@ public final class Constants {
 	public static final int MILLISECONDS_PER_FRAME = 1000 / 60;
 	public static final String FILENAME = "./data/clean.csv";
 	public static final int LINES = 239823;
+	public static final int SPACE_BETWEEN_NODES = 10 * NODE_RADIUS;
 }
