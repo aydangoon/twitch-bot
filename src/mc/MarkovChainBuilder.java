@@ -24,7 +24,7 @@ public class MarkovChainBuilder extends JPanel {
 		this.actionName = new JLabel();
 		
 		this.setLayout(new FlowLayout(FlowLayout.CENTER));
-		this.setSize(400, 200);
+		this.setSize(400, 100);
 		
 		this.add(this.actionName);
 		this.add(this.progressPercent);
@@ -34,14 +34,14 @@ public class MarkovChainBuilder extends JPanel {
 	public void buildMarkovChain() {
 		
 		this.progress.setValue(0);
-		this.progress.setMaximum(1000/*this.messages.size() / 10*/);
+		this.progress.setMaximum(this.messages.size() / 10);
 		this.progressPercent.setText("0%");
 		this.actionName.setText("Gathering all unique words...");
 		
 		List<String> words = new LinkedList<String>();
-		for (int i = 0; i < 1000/*this.messages.size() / 10*/; i++) {
+		for (int i = 0; i < this.messages.size() / 10; i++) {
 			Message message = this.messages.get(i);
-			for (String word : message.getText().replaceAll("[^ a-zA-Z0-9]", "").toLowerCase().split(" ")) {
+			for (String word : message.getText().split(" ")) {
 				words.add(word);
 			}
 			this.updateProgress();

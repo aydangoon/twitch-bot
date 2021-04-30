@@ -10,6 +10,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -17,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -52,9 +58,12 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 	private JPanel infoPanel;
 	private JLabel camInfo;
 	private JPanel senGen;
-	private JTextArea sentence;
+	private JLabel sentence;
+	private Map<String, String> emotes;
 	
 	public MarkovChainVisualization(Digraph<T> g) {
+		
+		this.emotes = EmoteFactory.getEmoteMap();
 		
 		this.mc = g;
 		this.buildVisuals(g);
@@ -76,8 +85,7 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		this.infoPanel.setBorder(BorderFactory.createLineBorder(Color.decode("#82C09A")));
 		
 		this.camInfo = new JLabel();
-		this.sentence = new JTextArea();
-		this.sentence.setEditable(false);
+		this.sentence = new JLabel();
 		this.senGen = new JPanel();
 		this.senGen.setLayout(new FlowLayout(FlowLayout.LEFT));
 		this.senGen.setBorder(BorderFactory.createLineBorder(Color.decode("#82c09a")));
@@ -266,8 +274,8 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 	@Override
 	public void keyTyped(KeyEvent e) {}
 	
-	private void generateSentence() {
-		T word = (T) "pagman";
+	private void generateSentence() {		
+		T word = mc.nodes().get((int)(Math.random() * mc.nodeCount()));
 		int c = 0;
 		int iters = 0;
 		StringBuilder sentence = new StringBuilder();
@@ -281,16 +289,22 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 					random -= this.mc.getWeight((T) word, nextWords.get(i));
 					i++;
 				}
-				sentence.append(word + " ");
+				
+				if (emotes.containsKey(word)) {
+					sentence.append("<img height=\"30\" src=\""+emotes.get(word)+"\"></img> ");
+				} else {
+					sentence.append(word + " ");
+				}
+				
 				word = nextWords.get(i);
 				if (c++ == 10) {
 					c = 0;
-					sentence.append("\n");
+					sentence.append("<br></br>");
 				}
 			}
 		} while (nextWords.size() > 0 && iters++ < 20);
 		
-		this.sentence.setText(sentence.toString());
+		this.sentence.setText("<html><div>" + sentence.toString() + "</div></html>");
 	}
 	
 	private void buildVisuals(Digraph<T> g) {
