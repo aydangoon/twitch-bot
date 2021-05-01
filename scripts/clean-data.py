@@ -36,16 +36,17 @@ def clean(line):
     msg_clean = re.sub(r"[\s]{2,}", " ", msg_clean)
 
     # TODO fix common misspellings
-    
+
     spell = SpellChecker()
-    spell.word_frequency.load_words() # enter list of emotes here
-    word_list = line.split()
+    spell.word_frequency.load_words(["pog"]) # enter list of emotes here
+    word_list = msg_clean.split()
     misspelled = spell.unknown(word_list)
 
     new_msg_list = []
     for word in misspelled:
         new_msg_list.append(spell.correction(word))
     new_msg = ' '.join(new_msg_list)
+    msg_clean = new_msg
     # do something with new_msg
 
     # stem exaggerations
@@ -55,7 +56,7 @@ def clean(line):
     # TODO other things idk
 
 
-    return msg_meta + " " + msg_clean
+    return msg_meta + " " + msg_clean + "\n"
 
 
 def main():
@@ -64,8 +65,9 @@ def main():
 
     lines = list(raw_data)
     num_lines = len(lines)
-    for i in range(num_lines):
+    for i in range(31):
         clean_data.write(clean(lines[i]))
+
         # DONT UNCOMMENT these mofos slow this process down an ungodly amount
         #os.system('clear')
         #print(i + 1, "/", num_lines, "cleaned")
