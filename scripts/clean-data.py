@@ -62,6 +62,7 @@ def clean(line):
 def main():
     raw_data = open(os.path.join(os.getcwd(), "data/test.csv"), "r")
     clean_data = open(os.path.join(os.getcwd(), "data/clean.csv"), "w")
+<<<<<<< HEAD
 
     lines = list(raw_data)
     num_lines = len(lines)
@@ -71,6 +72,11 @@ def main():
         # DONT UNCOMMENT these mofos slow this process down an ungodly amount
         #os.system('clear')
         #print(i + 1, "/", num_lines, "cleaned")
+=======
+    
+    for line in raw_data:
+        clean_data.write(clean(line))
+>>>>>>> be9899ab78cd346fd991b39f5191f5ba44e3b9c4
 
 
 main()
