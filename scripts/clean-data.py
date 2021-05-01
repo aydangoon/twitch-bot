@@ -36,6 +36,7 @@ def clean(line):
     msg_clean = re.sub(r"[\s]{2,}", " ", msg_clean)
 
     # TODO fix common misspellings
+    
     spell = SpellChecker()
     spell.word_frequency.load_words() # enter list of emotes here
     word_list = line.split()
