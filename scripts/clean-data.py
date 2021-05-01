@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import re
 import os
+from spellchecker import SpellChecker
 
 common_exags = [
     # words
@@ -16,7 +17,7 @@ def clean(line):
 
     comma_cnt = 0
     for i in range(len(line)):
-       if line[i] == ',':
+        if line[i] == ',':
             comma_cnt+=1
             if comma_cnt == 5:
                 split_ind = i
@@ -33,7 +34,18 @@ def clean(line):
 
     # remove extraneous spaces
     msg_clean = re.sub(r"[\s]{2,}", " ", msg_clean)
+
     # TODO fix common misspellings
+    spell = SpellChecker()
+    spell.word_frequency.load_words() # enter list of emotes here
+    word_list = line.split()
+    misspelled = spell.unknown(word_list)
+
+    new_msg_list = []
+    for word in misspelled:
+        new_msg_list.append(spell.correction(word))
+    new_msg = ' '.join(new_msg_list)
+    # do something with new_msg
 
     # stem exaggerations
     for reg, rep in common_exags:
