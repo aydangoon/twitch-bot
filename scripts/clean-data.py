@@ -36,18 +36,24 @@ def clean(line):
     msg_clean = re.sub(r"[\s]{2,}", " ", msg_clean)
 
     # TODO fix common misspellings
-
+    
+    emotes = open(os.path.join(os.getcwd(), "data/emotes.csv"), "r")
+    emote_list_csv = list(emotes)
+    emote_list = []
+    for line in emote_list_csv:
+        emote_list.append(line.split(",")[0])
     spell = SpellChecker()
-    spell.word_frequency.load_words(["pog"]) # enter list of emotes here
+    spell.word_frequency.load_words(emote_list) # enter list of emotes here
+    #spell.known(["PagMan"]) # idk
+
     word_list = msg_clean.split()
-    misspelled = spell.unknown(word_list)
+    #misspelled = spell.unknown(word_list) # don't know how to use this
 
     new_msg_list = []
-    for word in misspelled:
+    for word in word_list:
+        # print(word, spell.correction(word))
         new_msg_list.append(spell.correction(word))
-    new_msg = ' '.join(new_msg_list)
-    msg_clean = new_msg
-    # do something with new_msg
+    msg_clean = ' '.join(new_msg_list)
 
     # stem exaggerations
     for reg, rep in common_exags:
