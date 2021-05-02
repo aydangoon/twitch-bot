@@ -306,7 +306,6 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 	private void generateSentence() {
 		this.sentenceWords.clear();
 		T word = mc.nodes().get((int)(Math.random() * mc.nodeCount()));
-		int c = 0;
 		int iters = 0;
 		StringBuilder sentence = new StringBuilder();
 		List<T> nextWords;
@@ -329,10 +328,6 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 				}
 				
 				word = nextWords.get(i);
-				if (c++ == 10) {
-					c = 0;
-					//sentence.append("<br></br>");
-				}
 			}
 		} while (nextWords.size() > 0 && iters++ < 40);
 		
