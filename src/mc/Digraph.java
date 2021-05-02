@@ -59,6 +59,10 @@ public class Digraph<T> {
 		return children;
 	}
 	
+	public int childCountOf(T src) {
+		return li.get(src).size();
+	}
+	
 	public List<T> nodes() {
 		List<T> out = new LinkedList<T>();
 		Iterator<T> iter = this.li.keySet().iterator();

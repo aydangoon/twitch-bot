@@ -30,7 +30,7 @@ public class TwitchBotMain {
 		mcb.parseMessagesFromCSV(Constants.FILENAME);
 		mcb.buildMarkovChain();
 		window.getContentPane().remove(mcb);
-		MarkovChainVisualization<String> mcv = new MarkovChainVisualization<String>(mcb.getMarkovChain());
+		MarkovChainVisualization<String> mcv = new MarkovChainVisualization<String>(mcb.getMarkovChain(), mcb.getAverageMessageLength());
 		window.getContentPane().add(mcv);
 		window.addKeyListener(mcv);
 		window.setSize(mcv.getPreferredSize());

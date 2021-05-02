@@ -12,6 +12,7 @@ public class MarkovChainBuilder extends JPanel {
 	
 	private List<Message> messages;
 	Digraph<String> mc;
+	private long avgMsgLen;
 	private JLabel actionName;
 	private JLabel progressPercent;
 	private JProgressBar progress;
@@ -45,7 +46,10 @@ public class MarkovChainBuilder extends JPanel {
 		
 		for (int i = 0; i < this.messages.size(); i++) {
 			Message message = this.messages.get(i);
-			for (String word : message.getText().split(" ")) {
+			String[] msgWords = message.getText().split(" ");
+			this.avgMsgLen += msgWords.length;
+			
+			for (String word : msgWords) {
 				words.add(word);
 			}
 			
@@ -92,6 +96,8 @@ public class MarkovChainBuilder extends JPanel {
 			this.updateProgress();
 		}
 		
+		this.avgMsgLen /= messages.size();
+		
 		System.out.println("time taken: " + (System.currentTimeMillis() - start));
 		
 	}
@@ -129,6 +135,10 @@ public class MarkovChainBuilder extends JPanel {
 	
 	public Digraph<String> getMarkovChain() {
 		return mc;
+	}
+	
+	public int getAverageMessageLength() {
+		return (int)this.avgMsgLen;
 	}
 	
 	private void updateProgress() {

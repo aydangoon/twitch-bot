@@ -17,9 +17,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
@@ -30,10 +32,17 @@ import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
+import utils.BadWordManager;
 import utils.Constants;
 import utils.Sunflower;
 import utils.UniformSquare;
@@ -48,6 +57,10 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 	private List<NodeVisual<T>> nodes;
 	private List<EdgeVisual<T>> edges;
 	private Digraph<T> mc;
+	private int avgMsgLen;
+	private double msgProbability;
+	private boolean customLen;
+	private int msgLen;
 	private int xInput;
 	private int yInput;
 	private int zoomInput;
@@ -64,11 +77,16 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 	private JLabel sentence;
 	private Map<String, String> emotes;
 	
-	public MarkovChainVisualization(Digraph<T> g) {
+	public MarkovChainVisualization(Digraph<T> g, int avgMsgLen) {
 		
 		this.emotes = EmoteFactory.getEmoteMap();
 		
 		this.mc = g;
+		this.avgMsgLen = avgMsgLen;
+		this.msgProbability = 0.0;
+		this.customLen = true;
+		this.msgLen = avgMsgLen;
+		
 		this.buildVisuals(g);
 		
 		cam = new Camera();
@@ -86,7 +104,7 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		this.infoPanel = new JPanel();
 		//this.infoPanel.setPreferredSize(new Dimension(Constants.WIDTH - 10, 200));
 		this.infoPanel.setFont(Constants.FONT);
-		this.infoPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
+		this.infoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		this.infoPanel.setBorder(BorderFactory.createLineBorder(Color.decode("#82C09A")));
 		
 		this.camInfo = new JLabel();
@@ -98,7 +116,7 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		this.graphInfo.setBorder(BorderFactory.createLineBorder(Color.decode("#82c09a")));
 		
 		this.sentence = new JLabel();
-		this.sentence.setPreferredSize(new Dimension(Constants.WIDTH / 2, 100));
+		this.sentence.setPreferredSize(new Dimension(Constants.WIDTH / 2, 200));
 		this.senGen = new JPanel();
 		this.senGen.setLayout(new FlowLayout(FlowLayout.LEFT));
 		this.senGen.setBorder(BorderFactory.createLineBorder(Color.decode("#82c09a")));
@@ -119,13 +137,41 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		});
 		genSen.setFocusable(false);
 		clearSen.setFocusable(false);
+		
+		JSlider msgLenSlider = new JSlider(JSlider.HORIZONTAL, 1, 50, this.msgLen);
+		msgLenSlider.setBackground(Color.BLACK);
+		msgLenSlider.setForeground(Color.BLACK);
+		msgLenSlider.setFocusable(false);
+		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+		labelTable.put(1, new JLabel("1") );
+		labelTable.put(50, new JLabel("50") );
+		msgLenSlider.setLabelTable(labelTable);
+		msgLenSlider.setMajorTickSpacing(10);
+		msgLenSlider.setPaintTicks(true);
+		msgLenSlider.setPaintLabels(true);
+		
+		msgLenSlider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				msgLen = msgLenSlider.getValue();
+			}
+		});
+		
+		JCheckBox custom = new JCheckBox("Custom", true);
+		custom.setFocusable(false);
+		custom.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				msgLenSlider.setVisible(custom.isSelected());
+				customLen = custom.isSelected();
+			}
+		});
+		
 		JPanel opts = new JPanel();
 		opts.setLayout(new BoxLayout(opts, BoxLayout.Y_AXIS));
-		opts.add(new JLabel("<html><b>Sentence Generator</b><div>Message Type:</div></html>"));
-		opts.add(new JCheckBox("subscriber", true));
-		opts.add(new JCheckBox("moderator", true));
-		opts.add(new JCheckBox("bot", true));
-		opts.add(new JCheckBox("pleb", true));
+		opts.add(new JLabel("<html><b>Sentence Generator</b><div>Message Length:</div></html>"));
+		opts.add(custom);
+		opts.add(msgLenSlider);
 		opts.add(genSen);
 		opts.add(clearSen);
 		this.senGen.add(opts);
@@ -139,6 +185,7 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		this.infoPanel.add(this.camInfo);
 		this.infoPanel.add(this.graphInfo);
 		this.infoPanel.add(this.senGen);
+		
 		this.infoPanel.setPreferredSize(this.infoPanel.getPreferredSize());
 		//this.addKeyListener(this);
 		
@@ -304,8 +351,17 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 	public void keyTyped(KeyEvent e) {}
 	
 	private void generateSentence() {
+		
+		int msgLen = this.customLen ? this.msgLen : (int)(this.avgMsgLen + ((new Random()).nextGaussian() * 2));
 		this.sentenceWords.clear();
-		T word = mc.nodes().get((int)(Math.random() * mc.nodeCount()));
+		this.msgProbability = 1.0;
+		
+		T word;
+		do {
+			word = mc.nodes().get((int)(Math.random() * mc.nodeCount()));
+		} while (mc.childCountOf(word) == 0);
+		
+		System.out.println(msgLen + " " + word);
 		int iters = 0;
 		StringBuilder sentence = new StringBuilder();
 		List<T> nextWords;
@@ -319,6 +375,12 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 					i++;
 				}
 				
+				this.msgProbability *= this.mc.getWeight((T) word, nextWords.get(i));
+				
+				if (BadWordManager.shouldCensor((String)word)) {
+					word = (T) BadWordManager.censor((String)word);
+				}
+				
 				this.sentenceWords.add(word);
 				
 				if (emotes.containsKey(word)) {
@@ -329,9 +391,11 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 				
 				word = nextWords.get(i);
 			}
-		} while (nextWords.size() > 0 && iters++ < 40);
+		} while (nextWords.size() > 0 && iters++ < msgLen);
 		
-		this.sentence.setText("<html><div>" + sentence.toString() + "</div></html>");
+		this.sentence.setText("<html><div><b>Message:</b> " + sentence.toString() + 
+				"</div><div><b>Message Probability:</b> "+this.msgProbability+"</html>");
+		this.senGen.setPreferredSize(this.senGen.getPreferredSize());
 		this.infoPanel.setPreferredSize(this.infoPanel.getPreferredSize());
 	}
 	
