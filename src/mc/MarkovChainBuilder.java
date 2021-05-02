@@ -34,12 +34,12 @@ public class MarkovChainBuilder extends JPanel {
 	public void buildMarkovChain() {
 		
 		this.progress.setValue(0);
-		this.progress.setMaximum(this.messages.size() / 10);
+		this.progress.setMaximum(200);
 		this.progressPercent.setText("0%");
 		this.actionName.setText("Gathering all unique words...");
 		
 		List<String> words = new LinkedList<String>();
-		for (int i = 0; i < this.messages.size() / 10; i++) {
+		for (int i = 0; i < 200; i++) {
 			Message message = this.messages.get(i);
 			for (String word : message.getText().split(" ")) {
 				words.add(word);

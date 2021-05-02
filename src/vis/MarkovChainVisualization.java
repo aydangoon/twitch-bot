@@ -54,9 +54,12 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 	private Camera cam;
 	private Timer t;
 	
+	private Set<T> sentenceWords;
+	
 	// jcomponents
 	private JPanel infoPanel;
 	private JLabel camInfo;
+	private JLabel graphInfo;
 	private JPanel senGen;
 	private JLabel sentence;
 	private Map<String, String> emotes;
@@ -78,45 +81,65 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		});
 		t.start();
 		
+		this.sentenceWords = new HashSet<T>();
+		
 		this.infoPanel = new JPanel();
-		this.infoPanel.setPreferredSize(new Dimension(Constants.WIDTH - 10, 175));
+		//this.infoPanel.setPreferredSize(new Dimension(Constants.WIDTH - 10, 200));
 		this.infoPanel.setFont(Constants.FONT);
-		this.infoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		this.infoPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
 		this.infoPanel.setBorder(BorderFactory.createLineBorder(Color.decode("#82C09A")));
 		
 		this.camInfo = new JLabel();
+		this.camInfo.setPreferredSize(new Dimension(100, 100));
+		this.camInfo.setBorder(BorderFactory.createLineBorder(Color.decode("#82c09a")));
+		
+		this.graphInfo = new JLabel("<html><b>Graph Info</b><div>Nodes: "+this.nodes.size()+ "</div><div>Edges:"+this.edges.size()+"</div></html>");
+		this.graphInfo.setPreferredSize(new Dimension(100, 100));
+		this.graphInfo.setBorder(BorderFactory.createLineBorder(Color.decode("#82c09a")));
+		
 		this.sentence = new JLabel();
+		this.sentence.setPreferredSize(new Dimension(Constants.WIDTH / 2, 100));
 		this.senGen = new JPanel();
 		this.senGen.setLayout(new FlowLayout(FlowLayout.LEFT));
 		this.senGen.setBorder(BorderFactory.createLineBorder(Color.decode("#82c09a")));
 		
 		JButton genSen = new JButton("Generate Sentence");
 		genSen.addActionListener(new ActionListener() {
-
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
 		        generateSentence();
 		    }
 		});
+		JButton clearSen = new JButton("Clear Sentence");
+		clearSen.addActionListener(new ActionListener() {
+			@Override
+		    public void actionPerformed(ActionEvent e) {
+		        clearSentence();
+		    }
+		});
 		genSen.setFocusable(false);
+		clearSen.setFocusable(false);
 		JPanel opts = new JPanel();
 		opts.setLayout(new BoxLayout(opts, BoxLayout.Y_AXIS));
-		opts.add(new JLabel("Message Type:"));
+		opts.add(new JLabel("<html><b>Sentence Generator</b><div>Message Type:</div></html>"));
 		opts.add(new JCheckBox("subscriber", true));
 		opts.add(new JCheckBox("moderator", true));
 		opts.add(new JCheckBox("bot", true));
 		opts.add(new JCheckBox("pleb", true));
 		opts.add(genSen);
+		opts.add(clearSen);
 		this.senGen.add(opts);
 		this.senGen.add(this.sentence);
 		
 		
-		this.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+		this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		this.setFocusable(true);
 		this.setPreferredSize(new Dimension(Constants.WIDTH, Constants.HEIGHT));
 		this.add(this.infoPanel);
 		this.infoPanel.add(this.camInfo);
+		this.infoPanel.add(this.graphInfo);
 		this.infoPanel.add(this.senGen);
+		this.infoPanel.setPreferredSize(this.infoPanel.getPreferredSize());
 		//this.addKeyListener(this);
 		
 
@@ -126,7 +149,8 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
-		Set<NodeVisual<T>> hidden = new HashSet<NodeVisual<T>>();
+		Set<NodeVisual<T>> offscreenNodes = new HashSet<NodeVisual<T>>();
+		Set<NodeVisual<T>> hiddenNodes = new HashSet<NodeVisual<T>>();
 		
 		Font font = Constants.FONT.deriveFont((float)(14 * cam.getZoom() + 7));
 		FontMetrics metrics = g.getFontMetrics(font);
@@ -142,7 +166,10 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		for (NodeVisual<T> node : nodes) {
 			if (node.getX() < cam.getX() - hiddenXOffset || node.getX() > cam.getX() + hiddenXOffset
 					|| node.getY() < cam.getY() - hiddenYOffset || node.getY() > cam.getY() + hiddenYOffset) {
-				hidden.add(node);
+				offscreenNodes.add(node);
+			} 
+			if (!this.sentenceWords.isEmpty() && !this.sentenceWords.contains(node.getValue())) {
+				hiddenNodes.add(node);
 			}
 		}
 		
@@ -157,7 +184,9 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 			x2 = (int)(cam.getZoom() * (tgt.getX() + xOffset - cam.getX()));
 			y2 = (int)(cam.getZoom() * (tgt.getY() + yOffset - cam.getY()));
 			
-			if (!src.equals(tgt) && (!hidden.contains(src) || !hidden.contains(tgt))) {
+			if (!src.equals(tgt) && 
+			    !hiddenNodes.contains(src) && !hiddenNodes.contains(tgt) && 
+			    (!offscreenNodes.contains(src) || !offscreenNodes.contains(tgt))) {
 				
 				sx = x2 - x;
 				sy = y2 - y;
@@ -195,16 +224,16 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		
 		String text;
 		for (NodeVisual<T> node : nodes) {
-			x = (int)(cam.getZoom() * (node.getX() - cam.getX() + xOffset - nr));
-			y = (int)(cam.getZoom() * (node.getY() - cam.getY() + yOffset - nr));
-			g.setColor(Constants.NODE_COLOR);
-			g.fillOval(x, y, (int)(2 * nr * cam.getZoom()), (int)(2 * nr * cam.getZoom()));
-			g.setColor(Constants.TEXT_COLOR);
-			text = node.getValue().toString();
-			
-			g.drawString(text, x + (int)(cam.getZoom() * nr) - (metrics.stringWidth(text) / 2), y);
+			if (!hiddenNodes.contains(node) && !offscreenNodes.contains(node)) {
+				x = (int)(cam.getZoom() * (node.getX() - cam.getX() + xOffset - nr));
+				y = (int)(cam.getZoom() * (node.getY() - cam.getY() + yOffset - nr));
+				g.setColor(Constants.NODE_COLOR);
+				g.fillOval(x, y, (int)(2 * nr * cam.getZoom()), (int)(2 * nr * cam.getZoom()));
+				g.setColor(Constants.TEXT_COLOR);
+				text = node.getValue().toString();
+				g.drawString(text, x + (int)(cam.getZoom() * nr) - (metrics.stringWidth(text) / 2), y);
+			}	
 		}
-		
 	}
 	
 	public void tick() {
@@ -274,7 +303,8 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 	@Override
 	public void keyTyped(KeyEvent e) {}
 	
-	private void generateSentence() {		
+	private void generateSentence() {
+		this.sentenceWords.clear();
 		T word = mc.nodes().get((int)(Math.random() * mc.nodeCount()));
 		int c = 0;
 		int iters = 0;
@@ -290,6 +320,8 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 					i++;
 				}
 				
+				this.sentenceWords.add(word);
+				
 				if (emotes.containsKey(word)) {
 					sentence.append("<img height=\"30\" src=\""+emotes.get(word)+"\"></img> ");
 				} else {
@@ -299,12 +331,18 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 				word = nextWords.get(i);
 				if (c++ == 10) {
 					c = 0;
-					sentence.append("<br></br>");
+					//sentence.append("<br></br>");
 				}
 			}
-		} while (nextWords.size() > 0 && iters++ < 20);
+		} while (nextWords.size() > 0 && iters++ < 40);
 		
 		this.sentence.setText("<html><div>" + sentence.toString() + "</div></html>");
+		this.infoPanel.setPreferredSize(this.infoPanel.getPreferredSize());
+	}
+	
+	private void clearSentence() {
+		this.sentence.setText("");
+		this.sentenceWords.clear();
 	}
 	
 	private void buildVisuals(Digraph<T> g) {
