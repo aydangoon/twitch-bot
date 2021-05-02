@@ -37,16 +37,23 @@ def clean(line):
 
     # TODO fix common misspellings
     
+    emotes = open(os.path.join(os.getcwd(), "data/emotes.csv"), "r")
+    emote_list_csv = list(emotes)
+    emote_list = []
+    for line in emote_list_csv:
+        emote_list.append(line.split(",")[0])
     spell = SpellChecker()
-    spell.word_frequency.load_words() # enter list of emotes here
-    word_list = line.split()
-    misspelled = spell.unknown(word_list)
+    spell.word_frequency.load_words(emote_list) # enter list of emotes here
+    #spell.known(["PagMan"]) # idk
+
+    word_list = msg_clean.split()
+    #misspelled = spell.unknown(word_list) # don't know how to use this
 
     new_msg_list = []
-    for word in misspelled:
+    for word in word_list:
+        # print(word, spell.correction(word))
         new_msg_list.append(spell.correction(word))
-    new_msg = ' '.join(new_msg_list)
-    # do something with new_msg
+    msg_clean = ' '.join(new_msg_list)
 
     # stem exaggerations
     for reg, rep in common_exags:
@@ -55,15 +62,21 @@ def clean(line):
     # TODO other things idk
 
 
-    return msg_meta + " " + msg_clean
+    return msg_meta + " " + msg_clean + "\n"
 
 
 def main():
     raw_data = open(os.path.join(os.getcwd(), "data/test.csv"), "r")
     clean_data = open(os.path.join(os.getcwd(), "data/clean.csv"), "w")
-    
-    for line in raw_data:
-        clean_data.write(clean(line))
+
+    lines = list(raw_data)
+    num_lines = len(lines)
+    for i in range(31):
+        clean_data.write(clean(lines[i]))
+
+        # DONT UNCOMMENT these mofos slow this process down an ungodly amount
+        #os.system('clear')
+        #print(i + 1, "/", num_lines, "cleaned")
 
 
 main()
