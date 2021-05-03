@@ -5,16 +5,10 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -24,21 +18,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.JSpinner;
-import javax.swing.JTextArea;
-import javax.swing.SpinnerModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.Timer;
-import javax.swing.border.EmptyBorder;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -187,9 +167,6 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		this.infoPanel.add(this.senGen);
 		
 		this.infoPanel.setPreferredSize(this.infoPanel.getPreferredSize());
-		//this.addKeyListener(this);
-		
-
 		
 	}	
 	
@@ -261,10 +238,7 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 				g.setColor(new Color((float)(0.25*(1-edge.getWeight())) + 0.5f, 0.75f, 0.75f));
 				g.drawLine(x, y, x2, y2);
 				g.fillPolygon(poiX, poiY, 3);
-				
-				// edge labels really clutter the graph. Maybe don't include?
-				//g.setColor(Constants.TEXT_COLOR);
-				//g.drawString(String.format("%.2f", edge.getWeight()), (x + x2) / 2, (y + y2) / 2);
+		
 			}
 			
 		}
@@ -350,6 +324,7 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 	@Override
 	public void keyTyped(KeyEvent e) {}
 	
+	@SuppressWarnings("unchecked")
 	private void generateSentence() {
 		
 		int msgLen = this.customLen ? this.msgLen : (int)(this.avgMsgLen + ((new Random()).nextGaussian() * 2));

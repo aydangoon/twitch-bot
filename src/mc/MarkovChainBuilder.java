@@ -8,6 +8,7 @@ import javax.swing.*;
 
 import utils.Constants;
 
+@SuppressWarnings("serial")
 public class MarkovChainBuilder extends JPanel {
 	
 	private List<Message> messages;
@@ -38,8 +39,6 @@ public class MarkovChainBuilder extends JPanel {
 		this.progress.setMaximum(this.messages.size());
 		this.progressPercent.setText("0%");
 		this.actionName.setText("Building Markov Chain...");
-		
-		long start = System.currentTimeMillis();
 		
 		List<String> words = new LinkedList<String>();
 		Map<String, Integer> proceeds = new HashMap<String, Integer>();
@@ -97,8 +96,6 @@ public class MarkovChainBuilder extends JPanel {
 		}
 		
 		this.avgMsgLen /= messages.size();
-		
-		System.out.println("time taken: " + (System.currentTimeMillis() - start));
 		
 	}
 	

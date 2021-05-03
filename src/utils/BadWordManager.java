@@ -2,7 +2,7 @@ package utils;
 
 public class BadWordManager {
 	private static final String[] badWords = {
-		"fuck", "shit", "retard", "ass", "bitch", "cock", "cum", "fag"
+		"fuck", "shit", "retard", "ass", "bitch", "cock", "cum", "fag", "dick", "gay"
 	};
 	
 	public static boolean shouldCensor(String word) {
