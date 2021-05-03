@@ -106,13 +106,15 @@ public class MarkovChainBuilder extends JPanel {
 		try {
 			
 			this.progress.setValue(0);
-			this.progress.setMaximum(Constants.LINES - 2);
+			this.progress.setMaximum(Constants.NUM_MESSAGES - 2);
 			this.actionName.setText("Parsing CSV file...");
+			
+			int lineNum = 1;
 			
 			sc = new Scanner(file);
 			int numHeaders = sc.nextLine().split(", ").length;
 			String[] row;
-			while (sc.hasNext()) {
+			while (sc.hasNext() && lineNum <= Constants.NUM_MESSAGES) {
 				row = sc.nextLine().split(", ", numHeaders);
 				this.messages.add(new Message(
 						row[0], 
@@ -122,6 +124,7 @@ public class MarkovChainBuilder extends JPanel {
 						Integer.parseInt(row[4]), 
 						row[5])
 				);
+				lineNum++;
 				this.updateProgress();
 			}
 			

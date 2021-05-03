@@ -82,7 +82,6 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		this.sentenceWords = new HashSet<T>();
 		
 		this.infoPanel = new JPanel();
-		//this.infoPanel.setPreferredSize(new Dimension(Constants.WIDTH - 10, 200));
 		this.infoPanel.setFont(Constants.FONT);
 		this.infoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		this.infoPanel.setBorder(BorderFactory.createLineBorder(Color.decode("#82C09A")));
@@ -386,15 +385,21 @@ public class MarkovChainVisualization<T> extends JPanel implements KeyListener {
 		Map<T, NodeVisual<T>> lookup = new HashMap<T, NodeVisual<T>>();
 		
 		List<T> rawNodes = g.nodes();
+		
+		// Pick whichever distribution you like. Would recommend 
+		// Uniform Square for large graphs.
+		
 		//Sunflower s = new Sunflower(g.nodeCount());
-		UniformSquare us = new UniformSquare((int)Math.sqrt(g.nodeCount()) + 1);
+		UniformSquare s = new UniformSquare((int)Math.sqrt(g.nodeCount()) + 1);
+		
+		
 		Tuple<Integer, Integer> pos;
 		
 		// generate node visuals and add to lookup table
 		// for quick generation of edge visuals
 		
 		for (T node : rawNodes) {
-			pos = us.nextPoint();
+			pos = s.nextPoint();
 			lookup.put(node, new NodeVisual<T>(node, pos._1, pos._2));
 		}
 		
