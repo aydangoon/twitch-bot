@@ -1,0 +1,31 @@
+TwitchBot
+
+;;;; Description ;;;;
+TwitchBot is a set of executables for collecting, cleaning, and ultimately displaying an interactive Markov Chain visualization
+and text generator from a twitch.tv chat dataset. TwitchBot uses graphs and graph algorithms for storing and interfacing with 
+the data as a Markov Chain is essentially a large weighted digraph. Information networks are also a significant part of TwitchBot
+as data was collected from livestreams on the world wide web and to collect this information internet protocols like HTTP were 
+needed. TwitchBot also made use of information retrieval for storing and accessing around one million unique chat messages and
+their associated data. To a lesser extent, TwitchBot handled social networks as data about user's social relationship to the
+broadcaster was collected, but we did not incorporate this data into our actual program.
+
+;;;; Work Break Down ;;;;
+Allison:
+- Worked on Markov Chain visualizer and builder. Specifically, building the graph from data files and in the visualizer handled
+camera movement code, global timer and key inputs.
+- Wrote code for directed graph data structure. 
+- Worked on algorithm for random sentence generation.
+Anna:
+- Worked on Markov Chain visualizer. 
+- Worked with JComponents to build the GUI for visualizer, sentence generator, camera info and
+graph info.
+- Wrote code for directed graph data structure.
+Aydan:
+- Nodejs program to collect and store livestream chat data.
+- Nodejs program to scrape betterttv.com to get a list of image src URLs for common emote images used on twitch.
+- Worked on Markov Chain GUI component, specifically camera and graphics. Also wrote node visual distribution code (Sunflower and UniformSquare).
+- Handled emote embedding into string and loading emote image URLs into code.
+Henry:
+- Python script to clean data. Script stemmed exaggerations, removed links, removed extraneous spaces, spell checking, etc.
+- Worked on Markov Chain GUI component, specifically edge and node visuals and the graphics code to draw arrow heads.
+- Worked on speed up for Markov Chain Builder to handle larger data sets.
