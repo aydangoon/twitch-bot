@@ -13,19 +13,21 @@ Out of the box, TwitchBot contains a dataset of approximately one million chat m
 This setup is for if you wish to train TwitchBot on a unique set of data collected from a different channel.
 1. Unzip the twitch-bot.zip file.
 2. In a bash shell, do:
+
     ```bash
     cd scripts
     npm install
-    node scraper.js -c <channel name> 
+    node scraper.js -c <channel name> -t <target filename>
     ```
-    ...and stop the process when you have collected your desired number of messages. <br /> 
+    ...and stop the process when you have collected your desired number of messages. The data collected will be present in file `twitch-bot/data/<target filename>`<br /> 
     **Note:** the channel you wish to collect messages from must
     be live. <br />
     _Optionally_, run `node scraper.js -h` for a full list of arguments and an explanation of how to use the the scraper. <br />
-    <span style="color:IndianRed">Warning:</span> changing the target file name with the `-t` flag will cause the next steps to fail. It is recommended to use the default target file name (`raw.csv`).
+    <span style="color:khaki">Warning:</span> the target file should be a `.csv` file.
 3. Again in a bash shell, do:
     ```bash
-    python ./clean-data.py
+    cd scripts
+    python ./clean-data.py <target filename>
     ```
 4. Your new set of data should now have been collected and cleaned. Proceed with the basic setup as usual to view the resulting Markov Chain!
 

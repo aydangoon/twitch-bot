@@ -26,7 +26,8 @@ const overwrite = args.includes('-overwrite')
 const channel = (args.includes('-c') && args.indexOf('-c') + 1 !== args.length) ? args[args.indexOf('-c') + 1] : 'xqcow'
 const filepath = path.join(
   __dirname,
-  (args.includes('-t') && args.indexOf('-t') + 1 !== args.length) ? args[args.indexOf('-t') + 1] : '../data/raw.csv'
+  '../data',
+  (args.includes('-t') && args.indexOf('-t') + 1 !== args.length) ? args[args.indexOf('-t') + 1] : 'raw.csv'
 )
 const sizeLimit = (args.includes('-size') && args.indexOf('-size') + 1 !== args.length)
   ? parseInt(args[args.indexOf('-size') + 1])

@@ -1,7 +1,8 @@
-#!/usr/bin/python3
+#!/usr/local/bin/python3.9
 import re
 import os
-from spellchecker import SpellChecker
+import sys
+#from spellchecker import SpellChecker
 
 common_exags = [
     # words
@@ -35,8 +36,8 @@ def clean(line):
     # remove extraneous spaces
     msg_clean = re.sub(r"[\s]{2,}", " ", msg_clean)
 
-    # TODO fix common misspellings
-    
+    # fix common misspellings
+    '''
     emotes = open(os.path.join(os.getcwd(), "data/emotes.csv"), "r")
     emote_list_csv = list(emotes)
     emote_list = []
@@ -53,29 +54,26 @@ def clean(line):
             print(word)
             new_msg_list.append(spell.correction(word))
     msg_clean = ' '.join(new_msg_list)
-
+    '''
     # stem exaggerations
     for reg, rep in common_exags:
         msg_clean = re.sub(reg, rep, msg_clean)
 
-    # TODO other things idk
-
-
-    return msg_meta + " " + msg_clean + "\n"
+    return msg_meta + " " + msg_clean # + "\n"
 
 
 def main():
-    raw_data = open(os.path.join(os.getcwd(), "data/test.csv"), "r")
-    clean_data = open(os.path.join(os.getcwd(), "data/clean.csv"), "w")
-
+    target_fi = sys.argv[1] if len(sys.argv) > 1 else "raw.csv"
+    this_dir = os.path.dirname(os.path.realpath(__file__))
+    try:
+        raw_data = open(os.path.join(this_dir, "../data", target_fi), "r")
+    except:
+        print("ERROR: target file not present in data directory")
+        return
+    clean_data = open(os.path.join(this_dir, "../data/clean.csv"), "w")
     lines = list(raw_data)
     num_lines = len(lines)
-    for i in range(147):
+    for i in range(num_lines):
         clean_data.write(clean(lines[i]))
-
-        # DONT UNCOMMENT these mofos slow this process down an ungodly amount
-        #os.system('clear')
-        #print(i + 1, "/", num_lines, "cleaned")
-
 
 main()
