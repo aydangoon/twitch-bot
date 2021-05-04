@@ -8,10 +8,12 @@ import javax.swing.*;
 
 import utils.Constants;
 
+@SuppressWarnings("serial")
 public class MarkovChainBuilder extends JPanel {
 	
 	private List<Message> messages;
 	Digraph<String> mc;
+	private long avgMsgLen;
 	private JLabel actionName;
 	private JLabel progressPercent;
 	private JProgressBar progress;
@@ -34,67 +36,67 @@ public class MarkovChainBuilder extends JPanel {
 	public void buildMarkovChain() {
 		
 		this.progress.setValue(0);
-		this.progress.setMaximum(this.messages.size() / 10);
+		this.progress.setMaximum(this.messages.size());
 		this.progressPercent.setText("0%");
-		this.actionName.setText("Gathering all unique words...");
+		this.actionName.setText("Building Markov Chain...");
 		
 		List<String> words = new LinkedList<String>();
-		for (int i = 0; i < this.messages.size() / 10; i++) {
-			Message message = this.messages.get(i);
-			for (String word : message.getText().split(" ")) {
-				words.add(word);
-			}
-			this.updateProgress();
-		}
-		
 		Map<String, Integer> proceeds = new HashMap<String, Integer>();
 		
-		this.actionName.setText("Building nodes...");
-		this.progress.setMaximum(words.size());
-		this.progress.setValue(0);
-		// add word nodes
-		for (int i = 0; i < words.size(); i++) {
-			if (!this.mc.hasNode(words.get(i))) 
-				this.mc.addNode(words.get(i));
+		for (int i = 0; i < this.messages.size(); i++) {
+			Message message = this.messages.get(i);
+			String[] msgWords = message.getText().split(" ");
+			this.avgMsgLen += msgWords.length;
+			
+			for (String word : msgWords) {
+				words.add(word);
+			}
+			
+			// add word nodes
+			for (int j = 0; j < words.size(); j++) {
+				if (!this.mc.hasNode(words.get(j))) 
+					this.mc.addNode(words.get(j));
+			}
+			// edges
+			for (int j = 0; j < words.size() - 1; j++) {
+				
+				String src = words.get(j);
+				String tgt = words.get(j + 1);
+				
+				if (!this.mc.hasEdge(src, tgt))
+					this.mc.addEdge(src, tgt, 1);
+				else
+					this.mc.setWeight(src, tgt, this.mc.getWeight(src, tgt) + 1);
+				
+				if (!proceeds.containsKey(src))
+					proceeds.put(src, 1);
+				else
+					proceeds.put(src, proceeds.get(src) + 1);	
+			}
+			
+			words.clear();
 			this.updateProgress();
 		}
-			
 		
-		// calculate total occurances
-		this.actionName.setText("Building edges...");
-		this.progress.setMaximum(words.size());
 		this.progress.setValue(0);
-		for (int i = 0; i < words.size() - 1; i++) {
-			
-			String src = words.get(i);
-			String tgt = words.get(i + 1);
-			
-			if (!this.mc.hasEdge(src, tgt))
-				this.mc.addEdge(src, tgt, 1);
-			else
-				this.mc.setWeight(src, tgt, this.mc.getWeight(src, tgt) + 1);
-			
-			if (!proceeds.containsKey(src))
-				proceeds.put(src, 1);
-			else
-				proceeds.put(src, proceeds.get(src) + 1);	
-			
-			this.updateProgress();
-		}
-		
-		
-		this.actionName.setText("Normalizing probabilites...");
 		this.progress.setMaximum(proceeds.keySet().size());
-		this.progress.setValue(0);
+		this.progressPercent.setText("0%");
+		this.actionName.setText("Generating Node Iterator...");
+		
 		// normalize
 		Iterator<String> iter = proceeds.keySet().iterator();
+		this.actionName.setText("Normalizing Edge Weights...");
 		while (iter.hasNext()) {
 			String src = iter.next();
 			for (String tgt : this.mc.childrenOf(src)) {
 				this.mc.setWeight(src, tgt, this.mc.getWeight(src, tgt) / proceeds.get(src));
+				
 			}
 			this.updateProgress();
 		}
+		
+		this.avgMsgLen /= messages.size();
+		
 	}
 	
 	public void parseMessagesFromCSV(String filename) {
@@ -104,13 +106,15 @@ public class MarkovChainBuilder extends JPanel {
 		try {
 			
 			this.progress.setValue(0);
-			this.progress.setMaximum(Constants.LINES - 2);
+			this.progress.setMaximum(Constants.NUM_MESSAGES - 2);
 			this.actionName.setText("Parsing CSV file...");
+			
+			int lineNum = 1;
 			
 			sc = new Scanner(file);
 			int numHeaders = sc.nextLine().split(", ").length;
 			String[] row;
-			while (sc.hasNext()) {
+			while (sc.hasNext() && lineNum <= Constants.NUM_MESSAGES) {
 				row = sc.nextLine().split(", ", numHeaders);
 				this.messages.add(new Message(
 						row[0], 
@@ -120,6 +124,7 @@ public class MarkovChainBuilder extends JPanel {
 						Integer.parseInt(row[4]), 
 						row[5])
 				);
+				lineNum++;
 				this.updateProgress();
 			}
 			
@@ -130,6 +135,10 @@ public class MarkovChainBuilder extends JPanel {
 	
 	public Digraph<String> getMarkovChain() {
 		return mc;
+	}
+	
+	public int getAverageMessageLength() {
+		return (int)this.avgMsgLen;
 	}
 	
 	private void updateProgress() {
