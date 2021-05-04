@@ -44,15 +44,14 @@ def clean(line):
         emote_list.append(line.split(",")[0])
     spell = SpellChecker()
     spell.word_frequency.load_words(emote_list) # enter list of emotes here
-    #spell.known(["PagMan"]) # idk
 
     word_list = msg_clean.split()
-    #misspelled = spell.unknown(word_list) # don't know how to use this
 
     new_msg_list = []
     for word in word_list:
-        # print(word, spell.correction(word))
-        new_msg_list.append(spell.correction(word))
+        if (word != '\U000e0000'):
+            print(word)
+            new_msg_list.append(spell.correction(word))
     msg_clean = ' '.join(new_msg_list)
 
     # stem exaggerations
@@ -71,7 +70,7 @@ def main():
 
     lines = list(raw_data)
     num_lines = len(lines)
-    for i in range(31):
+    for i in range(147):
         clean_data.write(clean(lines[i]))
 
         # DONT UNCOMMENT these mofos slow this process down an ungodly amount
