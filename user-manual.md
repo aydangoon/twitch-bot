@@ -40,7 +40,7 @@ The visualizer displays the Markov Chain and the sentence generator. In the Mark
 * Press `clear sentence` to display the entire graph again.
 ## Code Settings
 * In file `/src/utils/Constants.java` You may play around with various display settings. In particular `NUM_MESSAGES` may be set to the amount of messages you wish to build the Markov Chain with. ~200,000 is recommend for a smooth, accurate, and generally fast experience but the visualizer can handle 1,000,000. 
-* In file `/src/vis/MarkovChainVisualizer.java` line 393, you may set the node spacial distribution pattern (Sunflower or Uniform Square). Uniform Square is recommended for large data sets.
+* In file `/src/vis/MarkovChainVisualizer.java` line 392, you may set the node spacial distribution pattern (Sunflower or Uniform Square). Uniform Square is recommended for large data sets.
 
 # Output & Data Context Considerations
 It's important to consider the context of the data collected. As mentioned before, the data came from streamer xQc's Minecraft Speedrun livestreams. As such, many Minecraft and Speedrunning terms are used frequently. Some common terms you'll see in the randomly generated messages are:
